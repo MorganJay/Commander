@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,11 +28,22 @@ namespace Commander
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var builder = new SqlConnectionStringBuilder
+            {
+                ConnectionString = Configuration.GetConnectionString("CommanderConnection"),
+                UserID = Configuration["UserID"],
+                Password = Configuration["Password"]
+            };
+            services.AddDbContext<CommanderContext>(options => options.UseSqlServer(builder.ConnectionString));
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Commander", Version = "v1" });
             });
+
+            services.AddCors(options => options.AddPolicy("AllowEverthing", builder => builder.AllowAnyOrigin()
+                                                                                              .AllowAnyMethod()
+                                                                                              .AllowAnyHeader()));
 
             services.AddScoped<ICommanderRepo, MockCommanderRepo>();
         }
