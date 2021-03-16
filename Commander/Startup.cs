@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace Commander
 {
@@ -29,16 +30,19 @@ namespace Commander
             };
             services.AddDbContext<CommanderContext>(options => options.UseSqlServer(builder.ConnectionString));
             services.AddControllers();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Commander", Version = "v1" });
             });
 
-            services.AddCors(options => options.AddPolicy("AllowEverthing", builder => builder.AllowAnyOrigin()
-                                                                                              .AllowAnyMethod()
-                                                                                             .AllowAnyHeader()));
-            //services.AddScoped<ICommanderRepo, MockCommanderRepo>();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             services.AddScoped<ICommanderRepo, SqlCommanderRepo>();
+
+            //services.AddCors(options => options.AddPolicy("AllowEverthing", builder => builder.AllowAnyOrigin()
+            //                                                                                  .AllowAnyMethod()
+            //                                                                                 .AllowAnyHeader()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
