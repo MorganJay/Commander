@@ -2,6 +2,7 @@
 using Commander.Data;
 using Commander.DTOs;
 using Commander.Models;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
@@ -71,5 +72,30 @@ namespace Commander.Controllers
 
         // ROll back migrations for id 3
         // JSON Patch standard specified in RFC 6902 with 6 operations: Add, Remove, Replace, Copy, Move and Test
+
+        // PATCH api/commands/{id}
+        [HttpPatch("{id}")]
+        public ActionResult PartialCommandUpdate(int id, JsonPatchDocument<CommandUpdateDto> patchDocument)
+        {
+            // Check if resource exists
+            var commandModelFromRepo = _repository.GetCommandById(id);
+            if (commandModelFromRepo is null) return NotFound();
+
+            // Apply patch content to new CommandUpdate Dto through mapper
+            var commandToPatch = _mapper.Map<CommandUpdateDto>(commandModelFromRepo);
+            patchDocument.ApplyTo(commandToPatch, ModelState);
+            // Validate model binding
+            if (!TryValidateModel(commandToPatch)) return ValidationProblem(ModelState);
+
+            // Update model data in repo with the new patch
+            _mapper.Map(commandToPatch, commandModelFromRepo);
+
+            // Update repository with new patched command
+            _repository.UpdateCommand(commandModelFromRepo);
+
+            _repository.SaveChanges();
+
+            return NoContent();
+        }
     }
 }

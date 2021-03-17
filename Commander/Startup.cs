@@ -1,3 +1,4 @@
+using System;
 using Commander.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using System;
+using Newtonsoft.Json.Serialization;
 
 namespace Commander
 {
@@ -29,7 +30,8 @@ namespace Commander
                 Password = Configuration["Password"]
             };
             services.AddDbContext<CommanderContext>(options => options.UseSqlServer(builder.ConnectionString));
-            services.AddControllers();
+
+            services.AddControllers().AddNewtonsoftJson(s => s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver());
 
             services.AddSwaggerGen(c =>
             {
