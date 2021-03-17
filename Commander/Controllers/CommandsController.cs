@@ -49,8 +49,27 @@ namespace Commander.Controllers
 
             var commandReadDto = _mapper.Map<CommandReadDto>(commandModel);
 
-            return CreatedAtRoute(nameof(GetCommandById), new { Id = commandReadDto.Id }, commandReadDto);
+            return CreatedAtRoute(nameof(GetCommandById), new { commandReadDto.Id }, commandReadDto);
             // return Ok(commandReadDto);
         }
+
+        // PUT api/commands/{id}
+        [HttpPut("{id}")]
+        public ActionResult UpdateCommand(int id, CommandUpdateDto commandUpdateDto)
+        {
+            var commandModelFromRepo = _repository.GetCommandById(id);
+            if (commandModelFromRepo is null) return NotFound();
+
+            _mapper.Map(commandUpdateDto, commandModelFromRepo);
+
+            _repository.UpdateCommand(commandModelFromRepo);
+
+            _repository.SaveChanges();
+
+            return NoContent();
+        }
+
+        // ROll back migrations for id 3
+        // JSON Patch standard specified in RFC 6902 with 6 operations: Add, Remove, Replace, Copy, Move and Test
     }
 }

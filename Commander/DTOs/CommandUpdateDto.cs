@@ -2,7 +2,7 @@
 
 namespace Commander.DTOs
 {
-    public class CommandCreateDto
+    public class CommandUpdateDto
     {
         [Required]
         [StringLength(250, MinimumLength = 10, ErrorMessage = "HowTo must be between 10 and 250 characters")]
