@@ -70,9 +70,7 @@ namespace Commander.Controllers
             return NoContent();
         }
 
-        // ROll back migrations for id 3
         // JSON Patch standard specified in RFC 6902 with 6 operations: Add, Remove, Replace, Copy, Move and Test
-
         // PATCH api/commands/{id}
         [HttpPatch("{id}")]
         public ActionResult PartialCommandUpdate(int id, JsonPatchDocument<CommandUpdateDto> patchDocument)

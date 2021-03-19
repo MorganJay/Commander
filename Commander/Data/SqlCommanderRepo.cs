@@ -45,7 +45,7 @@ namespace Commander.Data
 
         public void UpdateCommand(Command command)
         {
-            // Nothing
+            // See controller for implementation
         }
     }
 }
